@@ -2,23 +2,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 int main(void)
 {
-    int  sfd;
-    struct sockaddr *sa;
-    char msg[256];
-    sfd = socket(PF_LOCAL, SOCK_DGRAM, 0);
-    if (sfd < 0)
-        return (1);
-    sa = calloc(sizeof(struct sockaddr), 1);
-    int cn = connect(sfd, sa, sizeof(sa));
-    printf("%d\n", cn);
-    while (1)
+    int                 socket_fd;
+    struct sockaddr_in *socket_addr;
+    char                buf[256];
+
+    socket_fd = socket(PF_INET, SOCK_STREAM, 0);
+    if (socket_fd < 0)
     {
-        printf("Waiting to send: ");
-        scanf("%s", msg);
-        send(sfd, msg, sizeof(msg), MSG_BATCH);
+        write(1, "socket fd\n", 11);
+        return (-1);
     }
     
+    socket_addr = calloc(sizeof(struct sockaddr_in), 1);
+    socket_addr->sin_family = AF_INET;
+    socket_addr->sin_port = htons(8080);
+    
+    if (inet_pton(AF_INET, "127.0.0.1", &socket_addr->sin_addr) <= 0)
+    {
+        write(1, "inet_pton\n", 11);
+        return (-1);
+    }
+
+    if (connect(socket_fd, (struct sockaddr *)socket_addr, sizeof(struct sockaddr_in)) < 0)
+    {
+        // write(1, "connect\n", 9);
+        perror("connect:");
+        return (-1);
+    }
+    
+    printf("Waiting to send: ");
+    fgets(buf, sizeof(buf), stdin);
+    buf[strcspn(buf, "\n")] = '\0'; 
+    send(socket_fd, buf, strlen(buf), 0);
+
+    free(socket_addr);
+    close(socket_fd);
 }
