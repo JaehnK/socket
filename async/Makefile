@@ -11,7 +11,7 @@ OBJS_CLIENT = $(SRCS_CLIENT:%.c=%.o)
 all: $(NAME_SERVER) $(NAME_CLIENT)
 
 %.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) -g -c $< -o $@
 	
 $(NAME_SERVER): $(OBJS_SERVER)
 	$(CC) $(OBJS_SERVER) -o $(NAME_SERVER)

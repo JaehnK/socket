@@ -5,6 +5,7 @@
         "socket.h": "c",
         "unistd.h": "c",
         "in.h": "c",
-        "inet.h": "c"
+        "inet.h": "c",
+        "types.h": "c"
     }
 }
